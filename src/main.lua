@@ -7,7 +7,11 @@ function love.load()
 
     love.graphics.setBackgroundColor(0.3, 0.3, 0.3)
 
-    createPlayer1(300, 300, 8, 8)
+    local p1X = 300
+    local p1Y = 300
+    local p1Width = 8
+    local p1Height = 8
+    player1 = Player(p1X, p1Y, p1Width, p1Height)
 end
 
 function love.update(dt)
@@ -16,8 +20,4 @@ end
 
 function love.draw()
     player1:draw()
-end
-
-function createPlayer1(x, y, pWidth, pHeight)
-    player1 = Player(x, y, pWidth, pHeight)
 end
