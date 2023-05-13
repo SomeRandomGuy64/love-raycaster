@@ -16,7 +16,7 @@ function Map:draw()
     local xOffset = 0
     local yOffset = 0
 
-    for currentY = 1, self.y + 1 do
+    for currentY = 1, self.y do
         for currentX = 1, self.x do
             if self.arrayMap[(currentY - 1) * self.x + currentX] == 1 then
                 love.graphics.setColor(1, 1, 1)
