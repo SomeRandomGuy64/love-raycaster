@@ -29,7 +29,7 @@ function Map:draw()
 
             love.graphics.rectangle("fill", xOffset, yOffset, self.blockSize, self.blockSize)
 
-            love.graphics.setColor(0, 0, 0)
+            love.graphics.setColor(0.3, 0.3, 0.3)
             love.graphics.rectangle("line", xOffset, yOffset, self.blockSize, self.blockSize)
         end
     end
