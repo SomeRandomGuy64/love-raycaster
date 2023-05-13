@@ -11,7 +11,7 @@ function love.load()
 end
 
 function love.update(dt)
-    -- body
+    player1:update(dt)
 end
 
 function love.draw()
