@@ -90,18 +90,23 @@ function Player:DrawRays3D(lineX, lineY, player)
     local mapX
     local mapY
     local mapPosition
-    local depthOfField = 0
+    local depthOfField
     local rayX
     local rayY
     local rayAngle
     local xOffset
     local yOffset
     local inverseTangent
+    local negativeTangent
+
+    local PI2 = math.pi / 2
+    local PI3 = (3 * math.pi) / 2
 
     rayAngle = player.angle
 
     for ray = 1, 1 do
         ---check horizontal lines---
+        depthOfField = 0
         inverseTangent = -1 / math.tan(rayAngle)
 
         ---looking up---
@@ -144,6 +149,52 @@ function Player:DrawRays3D(lineX, lineY, player)
 
         ---draw ray---
         love.graphics.setColor(0, 1, 0)
+        love.graphics.line(lineX, lineY, rayX, rayY)
+
+        ---check vertical lines---
+        depthOfField = 0
+        negativeTangent = -(math.tan(rayAngle))
+
+        ---looking left---
+        if rayAngle > PI2 and rayAngle < PI3 then
+            rayX = math.floor(player.x / 64) * 64 - 0.0001
+            rayY = (player.x - rayX) * negativeTangent + player.y
+            xOffset = -64
+            yOffset = -xOffset * negativeTangent
+        end
+
+        ---looking right---
+        if rayAngle < PI2 or rayAngle > PI3 then
+            rayX = math.floor(player.x / 64) * 64 + 64
+            rayY = (player.x - rayX) * negativeTangent + player.y
+            xOffset = 64
+            yOffset = -xOffset * negativeTangent
+        end
+
+        -- looking straight up or down---
+        if rayAngle == 0 or rayAngle == math.pi then
+            rayX = player.x
+            rayY = player.y
+            depthOfField = 8
+        end
+
+        while depthOfField < 8 do
+            mapX = math.floor(rayX / 64)
+            mapY = math.floor(rayY / 64)
+            mapPosition = mapY * player.level.x + mapX
+
+            ---hit wall---
+            if mapPosition < player.level.x * player.level.y and player.level.arrayMap[mapPosition + 1] == 1 then
+                depthOfField = 8
+            else
+                rayX = rayX + xOffset
+                rayY = rayY + yOffset
+                depthOfField = depthOfField + 1
+            end
+        end
+
+        ---draw ray---
+        love.graphics.setColor(1, 0, 0)
         love.graphics.line(lineX, lineY, rayX, rayY)
     end
 end
