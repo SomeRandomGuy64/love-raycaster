@@ -6,14 +6,13 @@ function love.load()
     require "src.map"
     require "src.player"
 
-    love.graphics.setBackgroundColor(0.3, 0.3, 0.3)
     local map1Array = {
         1,1,1,1,1,1,1,1,
+        1,0,0,0,0,0,1,1,
         1,0,0,0,0,0,0,1,
+        1,0,1,0,0,0,0,1,
         1,0,0,0,0,0,0,1,
-        1,0,0,0,1,1,1,1,
-        1,0,0,1,0,0,0,1,
-        1,0,0,0,0,0,0,1,
+        1,0,1,0,1,0,0,1,
         1,0,0,0,1,0,0,1,
         1,1,1,1,1,1,1,1
     }
@@ -32,6 +31,10 @@ function love.update(dt)
 end
 
 function love.draw()
+    love.graphics.setColor(0, 1, 1)
+    love.graphics.rectangle("fill", 0, 0, 1024, 160)
+    love.graphics.setColor(0, 0, 1)
+    love.graphics.rectangle("fill", 0, 160, 1024, 160)
     map1:draw()
     player1:draw()
 end
