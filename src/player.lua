@@ -25,15 +25,48 @@ function Player:update(dt)
     Player:QuickPress(self, dt)
     self.controlFlag = false
 
+    ---collision---
+    local xOffset = 0
+    local yOffset = 0
+
+    if self.deltaX < 0 then
+        xOffset = -20
+    else
+        xOffset = 20
+    end
+    
+    local gridPositionX = math.floor(self.x / 64)
+    local gridPositionPlusXOffset = math.floor((self.x + xOffset) / 64)
+    local gridPositionMinusXOffset = math.floor((self.x - xOffset) / 64)  
+    
+    if self.deltaY < 0 then
+        yOffset = -20
+    else
+        yOffset = 20
+    end
+    
+    local gridPositionY = math.floor(self.y / 64)
+    local gridPositionPlusYOffset = math.floor((self.y + yOffset) / 64)
+    local gridPositionMinusYOffset = math.floor((self.y - yOffset) / 64)  
+
+
     ---controls---
     if love.keyboard.isDown("w") then
-        self.x = self.x + (self.deltaX * dt * self.speed)
-        self.y = self.y + (self.deltaY * dt * self.speed)
+        if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionPlusXOffset) + 1] == 0 then
+            self.x = self.x + (self.deltaX * dt * self.speed)
+        end
+        if self.level.arrayMap[math.floor(gridPositionPlusYOffset * self.level.x + gridPositionX) + 1] == 0 then
+            self.y = self.y + (self.deltaY * dt * self.speed)
+        end
     end
 
     if love.keyboard.isDown("s") then
-        self.x = self.x - (self.deltaX * dt * self.speed)
-        self.y = self.y - (self.deltaY * dt * self.speed)
+        if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusXOffset) + 1] == 0 then
+            self.x = self.x - (self.deltaX * dt * self.speed)
+        end
+        if self.level.arrayMap[math.floor(gridPositionMinusYOffset * self.level.x + gridPositionX) + 1] == 0 then
+            self.y = self.y - (self.deltaY * dt * self.speed)
+        end
     end
 
     if love.keyboard.isDown("a") then
