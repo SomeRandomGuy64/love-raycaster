@@ -125,7 +125,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         rayAngle = rayAngle - 2 * math.pi
     end
 
-    for rays = 1, 60 do
+    for rays = 1, 240 do
         ---check horizontal lines---
         depthOfField = 0
 
@@ -270,11 +270,11 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
         lineO = 160 - lineH / 2
 
-        love.graphics.setLineWidth(8)
-        love.graphics.line(ray * 8 + 530, lineO, ray * 8 + 530, lineH + lineO)
+        love.graphics.setLineWidth(2)
+        love.graphics.line(ray * 2 + 510, lineO, ray * 2 + 510, lineH + lineO)
         love.graphics.setLineWidth(1)
 
-        rayAngle = rayAngle + DR
+        rayAngle = rayAngle + DR/4
 
         if rayAngle < 0 then
             rayAngle = rayAngle + 2 * math.pi
