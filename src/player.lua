@@ -13,7 +13,7 @@ function Player:new(x, y, playerWidth, playerHeight, level)
     self.speed = 10
 
     self.deltaX = math.cos(self.angle) * self.speed
-    self.deltaY = math.cos(self.angle) * self.speed
+    self.deltaY = math.sin(self.angle) * self.speed
 
     self.controlFlag = true
 end
@@ -99,6 +99,14 @@ function Player:DrawRays3D(lineX, lineY, player)
     local inverseTangent
     local negativeTangent
 
+    local disH
+    local horizontalX
+    local horizontalY
+
+    local disV
+    local verticalX
+    local verticalY
+
     local PI2 = math.pi / 2
     local PI3 = (3 * math.pi) / 2
 
@@ -107,28 +115,33 @@ function Player:DrawRays3D(lineX, lineY, player)
     for ray = 1, 1 do
         ---check horizontal lines---
         depthOfField = 0
+
+        disH = 9999
+        horizontalX = lineX
+        horizontalY = lineY
+
         inverseTangent = -1 / math.tan(rayAngle)
 
         ---looking up---
         if rayAngle > math.pi then
-            rayY = math.floor(player.y / 64) * 64 - 0.0001
-            rayX = (player.y - rayY) * inverseTangent + player.x
+            rayY = math.floor(lineY / 64) * 64 - 0.0001
+            rayX = (lineY - rayY) * inverseTangent + lineX
             yOffset = -64
             xOffset = -yOffset * inverseTangent
         end
 
         ---looking down---
         if rayAngle < math.pi then
-            rayY = math.floor(player.y / 64) * 64 + 64
-            rayX = (player.y - rayY) * inverseTangent + player.x
+            rayY = math.floor(lineY / 64) * 64 + 64
+            rayX = (lineY - rayY) * inverseTangent + lineX
             yOffset = 64
             xOffset = -yOffset * inverseTangent
         end
 
         -- looking straight left or right---
         if rayAngle == 0 or rayAngle == math.pi then
-            rayX = player.x
-            rayY = player.y
+            rayX = lineX
+            rayY = lineY
             depthOfField = 8
         end
 
@@ -138,7 +151,10 @@ function Player:DrawRays3D(lineX, lineY, player)
             mapPosition = mapY * player.level.x + mapX
 
             ---hit wall---
-            if mapPosition < player.level.x * player.level.y and player.level.arrayMap[mapPosition + 1] == 1 then
+            if mapPosition > 0 and mapPosition < player.level.x * player.level.y and player.level.arrayMap[mapPosition + 1] == 1 then
+                horizontalX = rayX
+                horizontalY = rayY
+                disH = Player:Dist(lineX, lineY, horizontalX, horizontalY, rayAngle)
                 depthOfField = 8
             else
                 rayX = rayX + xOffset
@@ -147,34 +163,40 @@ function Player:DrawRays3D(lineX, lineY, player)
             end
         end
 
-        ---draw ray---
-        love.graphics.setColor(0, 1, 0)
-        love.graphics.line(lineX, lineY, rayX, rayY)
+        --love.graphics.setColor(0, 1, 0)
+        --love.graphics.setLineWidth(5)
+        --love.graphics.line(lineX, lineY, rayX, rayY)
+        --love.graphics.setLineWidth(2)
 
         ---check vertical lines---
         depthOfField = 0
+
+        disV = 9999
+        verticalX = lineX
+        verticalY = lineY
+
         negativeTangent = -(math.tan(rayAngle))
 
         ---looking left---
         if rayAngle > PI2 and rayAngle < PI3 then
-            rayX = math.floor(player.x / 64) * 64 - 0.0001
-            rayY = (player.x - rayX) * negativeTangent + player.y
+            rayX = math.floor(lineX / 64) * 64 - 0.0001
+            rayY = (lineX - rayX) * negativeTangent + lineY
             xOffset = -64
             yOffset = -xOffset * negativeTangent
         end
 
         ---looking right---
         if rayAngle < PI2 or rayAngle > PI3 then
-            rayX = math.floor(player.x / 64) * 64 + 64
-            rayY = (player.x - rayX) * negativeTangent + player.y
+            rayX = math.floor(lineX / 64) * 64 + 64
+            rayY = (lineX - rayX) * negativeTangent + lineY
             xOffset = 64
             yOffset = -xOffset * negativeTangent
         end
 
         -- looking straight up or down---
         if rayAngle == 0 or rayAngle == math.pi then
-            rayX = player.x
-            rayY = player.y
+            rayX = lineX
+            rayY = lineY
             depthOfField = 8
         end
 
@@ -184,7 +206,10 @@ function Player:DrawRays3D(lineX, lineY, player)
             mapPosition = mapY * player.level.x + mapX
 
             ---hit wall---
-            if mapPosition < player.level.x * player.level.y and player.level.arrayMap[mapPosition + 1] == 1 then
+            if mapPosition > 0 and mapPosition < player.level.x * player.level.y and player.level.arrayMap[mapPosition + 1] == 1 then
+                verticalX = rayX
+                verticalY = rayY
+                disV = Player:Dist(lineX, lineY, verticalX, verticalY, rayAngle)
                 depthOfField = 8
             else
                 rayX = rayX + xOffset
@@ -193,8 +218,22 @@ function Player:DrawRays3D(lineX, lineY, player)
             end
         end
 
+        if disV < disH then
+            rayX = verticalX
+            rayY = verticalY
+        end
+
+        if disH < disV then
+            rayX = horizontalX
+            rayY = horizontalY
+        end
+
         ---draw ray---
         love.graphics.setColor(1, 0, 0)
         love.graphics.line(lineX, lineY, rayX, rayY)
     end
+end
+
+function Player:Dist(ax, ay, bx, by, angle)
+    return (math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)))
 end
