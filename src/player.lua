@@ -9,7 +9,7 @@ function Player:new(x, y, playerWidth, playerHeight, level)
     self.playerHeight = playerHeight
     self.level = level
 
-    self.angle = 100
+    self.angle = 0
 
     self.speed = 10
 
@@ -89,6 +89,7 @@ function Player:draw()
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
+    local ray = 1
     local mapX
     local mapY
     local mapPosition
@@ -109,6 +110,8 @@ function Player:DrawRays3D(lineX, lineY, player)
     local verticalX
     local verticalY
 
+    local finalDistance
+
     local PI2 = math.pi / 2
     local PI3 = (3 * math.pi) / 2
 
@@ -122,7 +125,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         rayAngle = rayAngle - 2 * math.pi
     end
 
-    for ray = 1, 60 do
+    for rays = 1, 60 do
         ---check horizontal lines---
         depthOfField = 0
 
@@ -231,16 +234,45 @@ function Player:DrawRays3D(lineX, lineY, player)
         if disV < disH then
             rayX = verticalX
             rayY = verticalY
+            finalDistance = disV
+            love.graphics.setColor(0.9, 0, 0)
         end
 
         if disH < disV then
             rayX = horizontalX
             rayY = horizontalY
+            finalDistance = disH
+            love.graphics.setColor(0.7, 0, 0)
         end
 
         ---draw ray---
-        love.graphics.setColor(1, 0, 0)
         love.graphics.line(lineX, lineY, rayX, rayY)
+
+        ---draw 3d scene---
+        local lineH
+        local lineO
+        local cosineAngle
+
+        cosineAngle = player.angle - rayAngle
+        if cosineAngle < 0 then
+            cosineAngle = cosineAngle + (2 * math.pi)
+        end
+
+        if cosineAngle > (2 * math.pi) then
+            cosineAngle = cosineAngle - (2 *  math.pi)
+        end
+
+        finalDistance = finalDistance * math.cos(cosineAngle)
+
+        lineH = (player.level.blockSize * 320) / finalDistance
+        if lineH > 320 then
+            lineH = 320
+        end
+        lineO = 160 - lineH / 2
+
+        love.graphics.setLineWidth(8)
+        love.graphics.line(ray * 8 + 530, lineO, ray * 8 + 530, lineH + lineO)
+        love.graphics.setLineWidth(1)
 
         rayAngle = rayAngle + DR
 
@@ -251,6 +283,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         if rayAngle > 2 * math.pi then
             rayAngle = rayAngle - 2 * math.pi
         end
+        ray = ray + 1
     end
 end
 
