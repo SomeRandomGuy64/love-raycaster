@@ -1,4 +1,5 @@
 Player = Entity:extend()
+_G.DR = 0.0174535  ---one degree in radians
 
 function Player:new(x, y, playerWidth, playerHeight, level)
     require = "src.map"
@@ -74,16 +75,17 @@ end
 
 function Player:draw()
     Player.super.draw(self)
-    love.graphics.setColor(1, 1, 0)
-
-    love.graphics.rectangle("fill", self.x, self.y, self.playerWidth, self.playerHeight)
-
+    
+    
     local lineX = self.x + (self.playerWidth / 2)
     local lineY = self.y + (self.playerHeight / 2)
-
+    
+    Player:DrawRays3D(lineX, lineY, self)
+    
+    love.graphics.setColor(1, 1, 0)
     love.graphics.line(lineX, lineY, lineX + self.deltaX * 5, lineY + self.deltaY * 5)
 
-    Player:DrawRays3D(lineX, lineY, self)
+    love.graphics.rectangle("fill", self.x, self.y, self.playerWidth, self.playerHeight)
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
@@ -110,9 +112,17 @@ function Player:DrawRays3D(lineX, lineY, player)
     local PI2 = math.pi / 2
     local PI3 = (3 * math.pi) / 2
 
-    rayAngle = player.angle
+    rayAngle = player.angle - DR * 30
 
-    for ray = 1, 1 do
+    if rayAngle < 0 then
+        rayAngle = rayAngle + 2 * math.pi
+    end
+
+    if rayAngle > 2 * math.pi then
+        rayAngle = rayAngle - 2 * math.pi
+    end
+
+    for ray = 1, 60 do
         ---check horizontal lines---
         depthOfField = 0
 
@@ -231,6 +241,16 @@ function Player:DrawRays3D(lineX, lineY, player)
         ---draw ray---
         love.graphics.setColor(1, 0, 0)
         love.graphics.line(lineX, lineY, rayX, rayY)
+
+        rayAngle = rayAngle + DR
+
+        if rayAngle < 0 then
+            rayAngle = rayAngle + 2 * math.pi
+        end
+    
+        if rayAngle > 2 * math.pi then
+            rayAngle = rayAngle - 2 * math.pi
+        end
     end
 end
 
