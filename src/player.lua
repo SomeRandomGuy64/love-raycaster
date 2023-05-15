@@ -2,8 +2,6 @@ Player = Entity:extend()
 _G.DR = 0.0174535  ---one degree in radians
 
 function Player:new(x, y, playerWidth, playerHeight, level)
-    require = "src.map"
-
     Player.super.new(self, x, y)
     self.playerWidth = playerWidth
     self.playerHeight = playerHeight
@@ -17,13 +15,17 @@ function Player:new(x, y, playerWidth, playerHeight, level)
     self.deltaY = math.sin(self.angle) * self.speed
 
     self.controlFlag = true
+
+
 end
 
 function Player:update(dt)
     Player.super.update(self, dt)
 
-    Player:QuickPress(self, dt)
-    self.controlFlag = false
+    if self.controlFlag == true then
+        Player:QuickPress(self, dt)
+        self.controlFlag = false
+    end
 
     ---collision---
     local xOffset = 0
@@ -139,11 +141,15 @@ function Player:DrawRays3D(lineX, lineY, player)
     local horizontalX
     local horizontalY
 
+    local shade
+
     local disV
     local verticalX
     local verticalY
 
     local finalDistance
+
+    local allTextures = require("src.textures.allTextures")
 
     local PI2 = math.pi / 2
     local PI3 = (3 * math.pi) / 2
@@ -158,7 +164,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         rayAngle = rayAngle - 2 * math.pi
     end
 
-    for rays = 1, 240 do
+    for rays = 1, 60 do
         ---check horizontal lines---
         depthOfField = 0
 
@@ -265,6 +271,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
 
         if disV < disH then
+            shade = 0.7
             rayX = verticalX
             rayY = verticalY
             finalDistance = disV
@@ -272,6 +279,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
 
         if disH < disV then
+            shade = 1
             rayX = horizontalX
             rayY = horizontalY
             finalDistance = disH
@@ -285,7 +293,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         local lineH
         local lineO
         local cosineAngle
-
+        ---fix fisheye---
         cosineAngle = player.angle - rayAngle
         if cosineAngle < 0 then
             cosineAngle = cosineAngle + (2 * math.pi)
@@ -298,16 +306,43 @@ function Player:DrawRays3D(lineX, lineY, player)
         finalDistance = finalDistance * math.cos(cosineAngle)
 
         lineH = (player.level.blockSize * 320) / finalDistance
+
+        local textureYStep = (32/lineH)
+        local textureYOffset = 0
+
         if lineH > 320 then
+            textureYOffset = (lineH - 320)/2
             lineH = 320
         end
         lineO = 160 - lineH / 2
 
-        love.graphics.setLineWidth(2)
-        love.graphics.line(ray * 2 + 510, lineO, ray * 2 + 510, lineH + lineO)
-        love.graphics.setLineWidth(1)
+        local textureY = textureYOffset * textureYStep
+        local textureX
+        
+        if shade == 0.7 then
+            textureX = math.floor(math.floor(rayY / 2) % 32)
+            if rayAngle > 90 * DR and rayAngle < 270 * DR then
+                textureX = 31 - textureX
+            end
+        else
+            textureX = math.floor(math.floor(rayX / 2) % 32)
+            if rayAngle > 0 and rayAngle < 180 * DR then
+                textureX = 31 - textureX
+            end
+        end
 
-        rayAngle = rayAngle + DR/4
+
+        for pixelY=1,lineH do
+            local index = (math.floor(textureY) * 32) + 1 + textureX
+            local c = allTextures[index] * shade
+            love.graphics.setPointSize(8)
+            love.graphics.setColor(c, c, c)
+            love.graphics.points(ray * 8 + 510, pixelY + lineO)
+            textureY = textureY + textureYStep
+        end
+
+
+        rayAngle = rayAngle + DR
 
         if rayAngle < 0 then
             rayAngle = rayAngle + 2 * math.pi
