@@ -32,9 +32,9 @@ end
 
 function love.draw()
     love.graphics.setColor(0, 1, 1)
-    love.graphics.rectangle("fill", 0, 0, 1024, 160)
+    love.graphics.rectangle("fill", 0, 0, 992, 160)
     love.graphics.setColor(0, 0, 1)
-    love.graphics.rectangle("fill", 0, 160, 1024, 160)
+    love.graphics.rectangle("fill", 0, 160, 992, 160)
     map1:draw()
     player1:draw()
 end

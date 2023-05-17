@@ -121,28 +121,16 @@ function Player:draw()
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
-    local ray = 1
-    local mapX = 0
-    local mapY = 0
-    local mapPosition = 0
+    local mapX, mapY, mapPosition = 0, 0, 0
     local depthOfField = 0
-    local rayX = 0
-    local rayY = 0
-    local rayAngle
-    local xOffset = 0
-    local yOffset = 0
-    local inverseTangent = 0
-    local negativeTangent = 0
+    local rayX, rayY, rayAngle = 0, 0, 0
+    local xOffset, yOffset = 0, 0
+    local inverseTangent, negativeTangent = 0, 0
 
-    local disH = 0
-    local horizontalX = 0
-    local horizontalY = 0
+    local disH, horizontalX, horizontalY = 0, 0, 0
+    local disV, verticalX, verticalY = 0, 0, 0
 
     local shade = 1
-
-    local disV = 0
-    local verticalX = 0
-    local verticalY = 0
 
     local finalDistance = 1
 
@@ -340,7 +328,7 @@ function Player:DrawRays3D(lineX, lineY, player)
             local c = allTextures[index] * shade
             love.graphics.setPointSize(4)
             love.graphics.setColor(c, c, c)
-            love.graphics.points(ray * 4 + 510, pixelY + lineO)
+            love.graphics.points(rays * 4 + 510, pixelY + lineO)
             textureY = textureY + textureYStep
         end
 
@@ -353,7 +341,6 @@ function Player:DrawRays3D(lineX, lineY, player)
         if rayAngle > 2 * math.pi then
             rayAngle = rayAngle - 2 * math.pi
         end
-        ray = ray + 1
     end
 end
 
