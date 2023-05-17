@@ -1,5 +1,5 @@
 Player = Entity:extend()
-_G.DR = 0.0174535  ---one degree in radians
+_G.DR = 0.0174535 ---one degree in radians
 
 function Player:new(x, y, playerWidth, playerHeight, level)
     Player.super.new(self, x, y)
@@ -15,7 +15,6 @@ function Player:new(x, y, playerWidth, playerHeight, level)
     self.deltaY = math.sin(self.angle) * self.speed
 
     self.controlFlag = true
-
 
 end
 
@@ -36,21 +35,20 @@ function Player:update(dt)
     else
         xOffset = 20
     end
-    
+
     local gridPositionX = math.floor(self.x / 64)
     local gridPositionPlusXOffset = math.floor((self.x + xOffset) / 64)
-    local gridPositionMinusXOffset = math.floor((self.x - xOffset) / 64)  
-    
+    local gridPositionMinusXOffset = math.floor((self.x - xOffset) / 64)
+
     if self.deltaY < 0 then
         yOffset = -20
     else
         yOffset = 20
     end
-    
+
     local gridPositionY = math.floor(self.y / 64)
     local gridPositionPlusYOffset = math.floor((self.y + yOffset) / 64)
-    local gridPositionMinusYOffset = math.floor((self.y - yOffset) / 64)  
-
+    local gridPositionMinusYOffset = math.floor((self.y - yOffset) / 64)
 
     ---controls---
     if love.keyboard.isDown("w") then
@@ -110,13 +108,12 @@ end
 
 function Player:draw()
     Player.super.draw(self)
-    
-    
+
     local lineX = self.x + (self.playerWidth / 2)
     local lineY = self.y + (self.playerHeight / 2)
-    
+
     Player:DrawRays3D(lineX, lineY, self)
-    
+
     love.graphics.setColor(1, 1, 0)
     love.graphics.line(lineX, lineY, lineX + self.deltaX * 5, lineY + self.deltaY * 5)
 
@@ -125,29 +122,29 @@ end
 
 function Player:DrawRays3D(lineX, lineY, player)
     local ray = 1
-    local mapX
-    local mapY
-    local mapPosition
-    local depthOfField
-    local rayX
-    local rayY
+    local mapX = 0
+    local mapY = 0
+    local mapPosition = 0
+    local depthOfField = 0
+    local rayX = 0
+    local rayY = 0
     local rayAngle
-    local xOffset
-    local yOffset
-    local inverseTangent
-    local negativeTangent
+    local xOffset = 0
+    local yOffset = 0
+    local inverseTangent = 0
+    local negativeTangent = 0
 
-    local disH
-    local horizontalX
-    local horizontalY
+    local disH = 0
+    local horizontalX = 0
+    local horizontalY = 0
 
-    local shade
+    local shade = 1
 
-    local disV
-    local verticalX
-    local verticalY
+    local disV = 0
+    local verticalX = 0
+    local verticalY = 0
 
-    local finalDistance
+    local finalDistance = 1
 
     local allTextures = require("src.textures.allTextures")
 
@@ -164,7 +161,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         rayAngle = rayAngle - 2 * math.pi
     end
 
-    for rays = 1, 60 do
+    for rays = 1, 120 do
         ---check horizontal lines---
         depthOfField = 0
 
@@ -174,28 +171,38 @@ function Player:DrawRays3D(lineX, lineY, player)
 
         inverseTangent = -1 / math.tan(rayAngle)
 
+        local directionalArguments = {
+            rayAngle = rayAngle,
+            rayX = rayX,
+            rayY = rayY,
+            lineX = lineX,
+            lineY = lineY,
+            inverseTangent = inverseTangent,
+            xOffset = xOffset,
+            yOffset = yOffset
+        }
+
         ---looking up---
         if rayAngle > math.pi then
-            rayY = math.floor(lineY / 64) * 64 - 0.0001
-            rayX = (lineY - rayY) * inverseTangent + lineX
-            yOffset = -64
-            xOffset = -yOffset * inverseTangent
-        end
-
-        ---looking down---
-        if rayAngle < math.pi then
-            rayY = math.floor(lineY / 64) * 64 + 64
-            rayX = (lineY - rayY) * inverseTangent + lineX
-            yOffset = 64
-            xOffset = -yOffset * inverseTangent
-        end
-
-        -- looking straight left or right---
-        if rayAngle == 0 or rayAngle == math.pi then
+            Player:DirectionLook(directionalArguments, -0.0001, -64)
+            ---looking down---
+        elseif rayAngle < math.pi then
+            Player:DirectionLook(directionalArguments, 64, 64)
+            -- looking straight left or right---
+        elseif rayAngle == 0 or rayAngle == math.pi then
             rayX = lineX
             rayY = lineY
             depthOfField = 8
         end
+
+        rayAngle = directionalArguments.rayAngle
+        rayX = directionalArguments.rayX
+        rayY = directionalArguments.rayY
+        lineX = directionalArguments.lineX
+        lineY = directionalArguments.lineY
+        inverseTangent = directionalArguments.inverseTangent
+        xOffset = directionalArguments.xOffset
+        yOffset = directionalArguments.yOffset
 
         while depthOfField < 8 do
             mapX = math.floor(rayX / 64)
@@ -203,7 +210,8 @@ function Player:DrawRays3D(lineX, lineY, player)
             mapPosition = mapY * player.level.x + mapX
 
             ---hit wall---
-            if mapPosition > 0 and mapPosition < player.level.x * player.level.y and player.level.arrayMap[mapPosition + 1] == 1 then
+            if mapPosition > 0 and mapPosition < player.level.x * player.level.y and
+                player.level.arrayMap[mapPosition + 1] == 1 then
                 horizontalX = rayX
                 horizontalY = rayY
                 disH = Player:Dist(lineX, lineY, horizontalX, horizontalY, rayAngle)
@@ -214,11 +222,6 @@ function Player:DrawRays3D(lineX, lineY, player)
                 depthOfField = depthOfField + 1
             end
         end
-
-        --love.graphics.setColor(0, 1, 0)
-        --love.graphics.setLineWidth(5)
-        --love.graphics.line(lineX, lineY, rayX, rayY)
-        --love.graphics.setLineWidth(2)
 
         ---check vertical lines---
         depthOfField = 0
@@ -258,7 +261,8 @@ function Player:DrawRays3D(lineX, lineY, player)
             mapPosition = mapY * player.level.x + mapX
 
             ---hit wall---
-            if mapPosition > 0 and mapPosition < player.level.x * player.level.y and player.level.arrayMap[mapPosition + 1] == 1 then
+            if mapPosition > 0 and mapPosition < player.level.x * player.level.y and
+                player.level.arrayMap[mapPosition + 1] == 1 then
                 verticalX = rayX
                 verticalY = rayY
                 disV = Player:Dist(lineX, lineY, verticalX, verticalY, rayAngle)
@@ -300,25 +304,25 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
 
         if cosineAngle > (2 * math.pi) then
-            cosineAngle = cosineAngle - (2 *  math.pi)
+            cosineAngle = cosineAngle - (2 * math.pi)
         end
 
         finalDistance = finalDistance * math.cos(cosineAngle)
 
         lineH = (player.level.blockSize * 320) / finalDistance
 
-        local textureYStep = (32/lineH)
+        local textureYStep = (32 / lineH)
         local textureYOffset = 0
 
         if lineH > 320 then
-            textureYOffset = (lineH - 320)/2
+            textureYOffset = (lineH - 320) / 2
             lineH = 320
         end
         lineO = 160 - lineH / 2
 
         local textureY = textureYOffset * textureYStep
         local textureX
-        
+
         if shade == 0.7 then
             textureX = math.floor(math.floor(rayY / 2) % 32)
             if rayAngle > 90 * DR and rayAngle < 270 * DR then
@@ -331,23 +335,21 @@ function Player:DrawRays3D(lineX, lineY, player)
             end
         end
 
-
-        for pixelY=1,lineH do
+        for pixelY = 1, lineH do
             local index = (math.floor(textureY) * 32) + 1 + textureX
             local c = allTextures[index] * shade
-            love.graphics.setPointSize(8)
+            love.graphics.setPointSize(4)
             love.graphics.setColor(c, c, c)
-            love.graphics.points(ray * 8 + 510, pixelY + lineO)
+            love.graphics.points(ray * 4 + 510, pixelY + lineO)
             textureY = textureY + textureYStep
         end
 
-
-        rayAngle = rayAngle + DR
+        rayAngle = rayAngle + DR / 2
 
         if rayAngle < 0 then
             rayAngle = rayAngle + 2 * math.pi
         end
-    
+
         if rayAngle > 2 * math.pi then
             rayAngle = rayAngle - 2 * math.pi
         end
@@ -357,4 +359,11 @@ end
 
 function Player:Dist(ax, ay, bx, by, angle)
     return (math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)))
+end
+
+function Player:DirectionLook(args, mainOffset, blockSize)
+    args.rayY = math.floor(args.lineY / 64) * 64 + mainOffset
+    args.rayX = (args.lineY - args.rayY) * args.inverseTangent + args.lineX
+    args.yOffset = blockSize
+    args.xOffset = -args.yOffset * args.inverseTangent
 end
