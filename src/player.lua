@@ -1,5 +1,8 @@
 Player = Entity:extend()
+---constants, don't change---
 _G.DR = 0.0174535 ---one degree in radians
+_G.PI2 = math.pi / 2
+_G.PI3 = (3 * math.pi) / 2
 
 function Player:new(x, y, playerWidth, playerHeight, level)
     Player.super.new(self, x, y)
@@ -123,23 +126,14 @@ end
 function Player:DrawRays3D(lineX, lineY, player)
     local mapX, mapY, mapPosition = 0, 0, 0
     local depthOfField = 0
-    local rayX, rayY, rayAngle = 0, 0, 0
+    local rayX, rayY, rayAngle = 0, 0, player.angle - DR * 30
     local xOffset, yOffset = 0, 0
     local inverseTangent, negativeTangent = 0, 0
-
     local disH, horizontalX, horizontalY = 0, 0, 0
     local disV, verticalX, verticalY = 0, 0, 0
-
     local shade = 1
-
     local finalDistance = 1
-
     local allTextures = require("src.textures.allTextures")
-
-    local PI2 = math.pi / 2
-    local PI3 = (3 * math.pi) / 2
-
-    rayAngle = player.angle - DR * 30
 
     if rayAngle < 0 then
         rayAngle = rayAngle + 2 * math.pi
@@ -152,45 +146,34 @@ function Player:DrawRays3D(lineX, lineY, player)
     for rays = 1, 120 do
         ---check horizontal lines---
         depthOfField = 0
-
         disH = 9999
         horizontalX = lineX
         horizontalY = lineY
-
         inverseTangent = -1 / math.tan(rayAngle)
 
         local directionalArguments = {
-            rayAngle = rayAngle,
             rayX = rayX,
             rayY = rayY,
-            lineX = lineX,
-            lineY = lineY,
-            inverseTangent = inverseTangent,
             xOffset = xOffset,
-            yOffset = yOffset
+            yOffset = yOffset,
+            depthOfField = depthOfField
         }
 
         ---looking up---
         if rayAngle > math.pi then
-            Player:DirectionLook(directionalArguments, -0.0001, -64)
+            Player:DirectionLook(directionalArguments, lineX, lineY, inverseTangent, -0.0001, -64)
             ---looking down---
         elseif rayAngle < math.pi then
-            Player:DirectionLook(directionalArguments, 64, 64)
-            -- looking straight left or right---
-        elseif rayAngle == 0 or rayAngle == math.pi then
-            rayX = lineX
-            rayY = lineY
-            depthOfField = 8
+            Player:DirectionLook(directionalArguments, lineX, lineY, inverseTangent, 64, 64)
         end
+        Player:DirectionStraight(directionalArguments, lineX, lineY, rayAngle)
+        -- looking straight left or right---
 
-        rayAngle = directionalArguments.rayAngle
         rayX = directionalArguments.rayX
         rayY = directionalArguments.rayY
-        lineX = directionalArguments.lineX
-        lineY = directionalArguments.lineY
-        inverseTangent = directionalArguments.inverseTangent
         xOffset = directionalArguments.xOffset
         yOffset = directionalArguments.yOffset
+        depthOfField = directionalArguments.depthOfField
 
         while depthOfField < 8 do
             mapX = math.floor(rayX / 64)
@@ -348,9 +331,17 @@ function Player:Dist(ax, ay, bx, by, angle)
     return (math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)))
 end
 
-function Player:DirectionLook(args, mainOffset, blockSize)
-    args.rayY = math.floor(args.lineY / 64) * 64 + mainOffset
-    args.rayX = (args.lineY - args.rayY) * args.inverseTangent + args.lineX
+function Player:DirectionLook(args, lineX, lineY, inverseTangent, mainOffset, blockSize)
+    args.rayY = math.floor(lineY / 64) * 64 + mainOffset
+    args.rayX = (lineY - args.rayY) * inverseTangent + lineX
     args.yOffset = blockSize
-    args.xOffset = -args.yOffset * args.inverseTangent
+    args.xOffset = -args.yOffset * inverseTangent
+end
+
+function Player:DirectionStraight(args, lineX, lineY, rayAngle)
+    if rayAngle == 0 or rayAngle == math.pi then
+        args.rayX = lineX
+        args.rayY = lineY
+        args.depthOfField = 8
+    end
 end
