@@ -89,6 +89,32 @@ function Player:update(dt)
         self.deltaX = math.cos(self.angle) * self.speed
         self.deltaY = math.sin(self.angle) * self.speed
     end
+
+    if love.keyboard.isDown("e") then
+        local doorXOffset = 0
+        local doorYOffset = 0
+        if self.deltaX < 0 then
+            doorXOffset = -25
+        else
+            doorXOffset = 25
+        end
+
+        if self.deltaY < 0 then
+            doorYOffset = -25
+        else
+            doorYOffset = 25
+        end
+
+        gridPositionX = math.floor(self.x / 64)
+        gridPositionMinusXOffset = math.floor((self.x + doorXOffset) / 64)
+
+        gridPositionY = math.floor(self.x / 64)
+        gridPositionMinusYOffset = math.floor((self.y + doorYOffset) / 64)
+
+        if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusXOffset) + 1] == 4 then
+            self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusXOffset) + 1] = 0
+        end
+    end
 end
 
 --- theres something really weird about the rays which stops after a and d are pressed, this is to fix that but i'm not sure how to actually, properly fix it so this is the best I could come up with
