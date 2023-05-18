@@ -133,6 +133,7 @@ function Player:DrawRays3D(lineX, lineY, player)
     local disV, verticalX, verticalY = 0, 0, 0
     local shade = 1
     local finalDistance = 1
+    local horizontalMapTexture, verticalMapTexture = 0, 0
     local allTextures = require("src.textures.allTextures")
 
     if rayAngle < 0 then
@@ -182,7 +183,8 @@ function Player:DrawRays3D(lineX, lineY, player)
 
             ---hit wall---
             if mapPosition > 0 and mapPosition < player.level.x * player.level.y and
-                player.level.arrayMap[mapPosition + 1] == 1 then
+                player.level.arrayMap[mapPosition + 1] > 0 then
+                horizontalMapTexture = player.level.arrayMap[mapPosition + 1]
                 horizontalX = rayX
                 horizontalY = rayY
                 disH = Player:Dist(lineX, lineY, horizontalX, horizontalY, rayAngle)
@@ -233,7 +235,8 @@ function Player:DrawRays3D(lineX, lineY, player)
 
             ---hit wall---
             if mapPosition > 0 and mapPosition < player.level.x * player.level.y and
-                player.level.arrayMap[mapPosition + 1] == 1 then
+                player.level.arrayMap[mapPosition + 1] > 0 then
+                verticalMapTexture = player.level.arrayMap[mapPosition + 1]
                 verticalX = rayX
                 verticalY = rayY
                 disV = Player:Dist(lineX, lineY, verticalX, verticalY, rayAngle)
@@ -246,6 +249,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
 
         if disV < disH then
+            horizontalMapTexture = verticalMapTexture
             shade = 0.7
             rayX = verticalX
             rayY = verticalY
@@ -291,7 +295,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
         lineO = 160 - lineH / 2
 
-        local textureY = textureYOffset * textureYStep
+        local textureY = (textureYOffset * textureYStep) + ((horizontalMapTexture - 1) * 32)
         local textureX
 
         if shade == 0.7 then

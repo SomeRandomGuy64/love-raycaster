@@ -18,7 +18,7 @@ function Map:draw()
 
     for currentY = 1, self.y do
         for currentX = 1, self.x do
-            if self.arrayMap[(currentY - 1) * self.x + currentX] == 1 then
+            if self.arrayMap[(currentY - 1) * self.x + currentX] > 0 then
                 love.graphics.setColor(1, 1, 1)
             else
                 love.graphics.setColor(0, 0, 0)        
