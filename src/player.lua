@@ -340,7 +340,18 @@ function Player:DrawRays3D(lineX, lineY, player)
             local index = (math.floor(textureY) * 32) + 1 + textureX
             local c = allTextures[index] * shade
             love.graphics.setPointSize(4)
-            love.graphics.setColor(c, c, c)
+            if horizontalMapTexture == 1 then
+                love.graphics.setColor(c, c/2, c/2)
+            end
+            if horizontalMapTexture == 2 then
+                love.graphics.setColor(c, c, c/2)
+            end
+            if horizontalMapTexture == 3 then
+                love.graphics.setColor(c/2, c/2, c )
+            end
+            if horizontalMapTexture == 4 then
+                love.graphics.setColor(c/2, c, c/2)
+            end
             love.graphics.points(rays * 4 + 510, pixelY + lineO)
             textureY = textureY + textureYStep
         end
