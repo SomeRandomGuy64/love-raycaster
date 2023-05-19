@@ -382,8 +382,18 @@ function Player:DrawRays3D(lineX, lineY, player)
             local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31) + mapPosition
             local c = allTextures[index] * 0.7
 
-            love.graphics.setColor(c, c, c)
+            love.graphics.setColor(c/1.3, c/1.3, c)
             love.graphics.points(rays * 4 + 510, i)
+
+            local arrayCeilingIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
+
+            mapPosition = (player.level.arrayCeiling[arrayCeilingIndex] - 1) * 32 * 32 + 1
+
+            local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31) + mapPosition
+            local c = allTextures[index] * 0.7
+
+            love.graphics.setColor(c/2, c/1.2, c/2)
+            love.graphics.points(rays * 4 + 510, 320 - i)
         end
 
         rayAngle = rayAngle + DR / 2
