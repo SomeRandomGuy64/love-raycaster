@@ -358,25 +358,28 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
 
         ---draw floors---
-        for i = math.floor(lineO + lineH), 320 do
+        for i = lineO + lineH, 320 do
             local bit = require('bit')
-            local degRayAngle = rayAngle * DR
             local newAngle = player.angle - rayAngle
-            newAngle = newAngle * DR
-            if newAngle > 359 then
-                newAngle = newAngle - 360
+            if newAngle < PI2 or newAngle > PI3 then
+                newAngle = newAngle - 360 / DR
             end
             if newAngle < 0 then
-                newAngle = newAngle + 360
+                newAngle = newAngle + 360 / DR
             end
             local drawY = i - (320/2)
             local raFix = math.cos(newAngle)
 
-            textureX = player.x / 2 + math.cos(degRayAngle) * 158  * 32 / drawY / raFix
+            textureX = player.x / 2 + math.cos(rayAngle) * 158  * 32 / drawY / raFix
 
-            textureY = player.y / 2 - math.sin(degRayAngle) * 158 * 32 / drawY / raFix
+            textureY = player.y / 2 + math.sin(rayAngle) * 158 * 32 / drawY / raFix
 
-            local index = (bit.band(math.floor(textureY), 31) * 32) + bit.band(math.floor(textureX), 31) + 1
+            local arrayFloorIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
+
+            mapPosition = (player.level.arrayFloor[arrayFloorIndex] - 1) * 32 * 32 + 1
+
+
+            local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31) + mapPosition
             local c = allTextures[index] * 0.7
 
             love.graphics.setColor(c, c, c)
