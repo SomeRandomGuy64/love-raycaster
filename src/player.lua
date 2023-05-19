@@ -321,6 +321,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
         lineO = 160 - lineH / 2
 
+        ---draw walls---
         local textureY = (textureYOffset * textureYStep) + ((horizontalMapTexture - 1) * 32)
         local textureX
 
@@ -341,19 +342,45 @@ function Player:DrawRays3D(lineX, lineY, player)
             local c = allTextures[index] * shade
             love.graphics.setPointSize(4)
             if horizontalMapTexture == 1 then
-                love.graphics.setColor(c, c/2, c/2)
+                love.graphics.setColor(c, c / 2, c / 2)
             end
             if horizontalMapTexture == 2 then
-                love.graphics.setColor(c, c, c/2)
+                love.graphics.setColor(c, c, c / 2)
             end
             if horizontalMapTexture == 3 then
-                love.graphics.setColor(c/2, c/2, c )
+                love.graphics.setColor(c / 2, c / 2, c)
             end
             if horizontalMapTexture == 4 then
-                love.graphics.setColor(c/2, c, c/2)
+                love.graphics.setColor(c / 2, c, c / 2)
             end
             love.graphics.points(rays * 4 + 510, pixelY + lineO)
             textureY = textureY + textureYStep
+        end
+
+        ---draw floors---
+        for i = math.floor(lineO + lineH), 320 do
+            local bit = require('bit')
+            local degRayAngle = rayAngle * DR
+            local newAngle = player.angle - rayAngle
+            newAngle = newAngle * DR
+            if newAngle > 359 then
+                newAngle = newAngle - 360
+            end
+            if newAngle < 0 then
+                newAngle = newAngle + 360
+            end
+            local drawY = i - (320/2)
+            local raFix = math.cos(newAngle)
+
+            textureX = player.x / 2 + math.cos(degRayAngle) * 158  * 32 / drawY / raFix
+
+            textureY = player.y / 2 - math.sin(degRayAngle) * 158 * 32 / drawY / raFix
+
+            local index = (bit.band(math.floor(textureY), 31) * 32) + bit.band(math.floor(textureX), 31) + 1
+            local c = allTextures[index] * 0.7
+
+            love.graphics.setColor(c, c, c)
+            love.graphics.points(rays * 4 + 510, i)
         end
 
         rayAngle = rayAngle + DR / 2
