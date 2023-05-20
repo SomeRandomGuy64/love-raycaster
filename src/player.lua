@@ -360,7 +360,7 @@ function Player:DrawRays3D(lineX, lineY, player)
             local red = newTiles[pixel + 1] / 255 * shade
             local green = newTiles[pixel + 2] / 255 * shade
             local blue = newTiles[pixel + 3] / 255 * shade
-            love.graphics.setPointSize(8)
+            love.graphics.setPointSize(4)
             love.graphics.setColor(red, green, blue)
             love.graphics.points(rays * 4 + 510, pixelY + lineO)
             textureY = textureY + textureYStep
@@ -379,29 +379,49 @@ function Player:DrawRays3D(lineX, lineY, player)
             local drawY = i - (320/2)
             local raFix = math.cos(newAngle)
 
-            textureX = player.x / 2 + math.cos(rayAngle) * 158  * 32 / drawY / raFix
+            textureX = (player.x / 2 + math.cos(rayAngle) * 158  * 32 / drawY / raFix) + 1
 
-            textureY = player.y / 2 + math.sin(rayAngle) * 158 * 32 / drawY / raFix
-
+            textureY = (player.y / 2 + math.sin(rayAngle) * 158 * 32 / drawY / raFix) + 1
+            
             local arrayFloorIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
 
+            local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31)
+            
             mapPosition = (player.level.arrayFloor[arrayFloorIndex] - 1) * 32 * 32 + 1
 
-
-            local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31) + mapPosition
-            local c = allTextures[index] * 0.7
-
-            love.graphics.setColor(c/1.3, c/1.3, c)
+            local pixel = (index * 3 + (mapPosition - 1) * 3)
+            local red = newTiles[pixel + 1] / 255 * 0.7
+            local green = newTiles[pixel + 2] / 255 * 0.7
+            local blue = newTiles[pixel + 3] / 255 * 0.7
+            love.graphics.setPointSize(4)
+            love.graphics.setColor(red, green, blue)
             love.graphics.points(rays * 4 + 510, i)
-            ---draw ceiling---
-            local arrayCeilingIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
 
+
+
+            --local c = allTextures[index] * 0.7
+
+            --love.graphics.setColor(c/1.3, c/1.3, c)
+            --love.graphics.points(rays * 4 + 510, i)
+            ---draw ceiling---
+            
+            
+            --local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31) + mapPosition
+            --local c = allTextures[index] * 0.7
+            
+            --love.graphics.setColor(c/2, c/1.2, c/2)
+            --love.graphics.points(rays * 4 + 510, 320 - i)
+
+            local arrayCeilingIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
+            
             mapPosition = (player.level.arrayCeiling[arrayCeilingIndex] - 1) * 32 * 32 + 1
 
-            local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31) + mapPosition
-            local c = allTextures[index] * 0.7
-
-            love.graphics.setColor(c/2, c/1.2, c/2)
+            local pixel = (index * 3 + (mapPosition - 1) * 3)
+            local red = newTiles[pixel + 1] / 255 
+            local green = newTiles[pixel + 2] / 255 
+            local blue = newTiles[pixel + 3] / 255 
+            love.graphics.setPointSize(4)
+            love.graphics.setColor(red, green, blue)
             love.graphics.points(rays * 4 + 510, 320 - i)
         end
 
