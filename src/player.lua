@@ -202,7 +202,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         yOffset = directionalArguments.yOffset
         depthOfField = directionalArguments.depthOfField
 
-        while depthOfField < 8 do
+        while depthOfField < 32 do
             mapX = math.floor(rayX / 64)
             mapY = math.floor(rayY / 64)
             mapPosition = mapY * player.level.x + mapX
@@ -214,7 +214,7 @@ function Player:DrawRays3D(lineX, lineY, player)
                 horizontalX = rayX
                 horizontalY = rayY
                 disH = Player:Dist(lineX, lineY, horizontalX, horizontalY, rayAngle)
-                depthOfField = 8
+                depthOfField = 32
             else
                 rayX = rayX + xOffset
                 rayY = rayY + yOffset
@@ -251,10 +251,10 @@ function Player:DrawRays3D(lineX, lineY, player)
         if rayAngle == 0 or rayAngle == math.pi then
             rayX = lineX
             rayY = lineY
-            depthOfField = 8
+            depthOfField = 32
         end
 
-        while depthOfField < 8 do
+        while depthOfField < 32 do
             mapX = math.floor(rayX / 64)
             mapY = math.floor(rayY / 64)
             mapPosition = mapY * player.level.x + mapX
@@ -266,7 +266,7 @@ function Player:DrawRays3D(lineX, lineY, player)
                 verticalX = rayX
                 verticalY = rayY
                 disV = Player:Dist(lineX, lineY, verticalX, verticalY, rayAngle)
-                depthOfField = 8
+                depthOfField = 32
             else
                 rayX = rayX + xOffset
                 rayY = rayY + yOffset
@@ -417,6 +417,6 @@ function Player:DirectionStraight(args, lineX, lineY, rayAngle)
     if rayAngle == 0 or rayAngle == math.pi then
         args.rayX = lineX
         args.rayY = lineY
-        args.depthOfField = 8
+        args.depthOfField = 32
     end
 end

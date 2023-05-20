@@ -6,7 +6,7 @@ function love.load()
     require "src.map"
     require "src.player"
 
-    dungeonMusic = love.audio.newSource('music/dungeon.mp3', 'stream')
+    dungeonMusic = love.audio.newSource('src/music/dungeon.mp3', 'stream')
     dungeonMusic:play()
 
     local map1Array = {
