@@ -367,10 +367,9 @@ function Player:DrawRays3D(lineX, lineY, player)
 
             
             ---ceiling logic---
-            
             local arrayCeilingIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
             
-            mapPosition = (player.level.arrayCeiling[arrayCeilingIndex] - 1) * 32 * 32 + 1
+            
             
             ---draw floors---
             local pixel = (index * 3 + (mapPosition - 1) * 3)
@@ -380,6 +379,7 @@ function Player:DrawRays3D(lineX, lineY, player)
             love.graphics.setColor(floorRed, floorGreen, floorBlue)
             love.graphics.points(rays * 8, i)
             ---draw ceiling---
+            mapPosition = (player.level.arrayCeiling[arrayCeilingIndex] - 1) * 32 * 32 + 1
             pixel = (index * 3 + (mapPosition - 1) * 3)
             local CeilRed = newTiles[pixel + 1] / 255 
             local CeilGreen = newTiles[pixel + 2] / 255 
