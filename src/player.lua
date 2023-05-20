@@ -138,31 +138,29 @@ end
 function Player:draw()
     Player.super.draw(self)
 
+    love.graphics.setPointSize(8)
+
     local lineX = self.x + (self.playerWidth / 2)
     local lineY = self.y + (self.playerHeight / 2)
-
+    
     Player:DrawRays3D(lineX, lineY, self)
-
-    love.graphics.setColor(1, 1, 0)
-    love.graphics.line(lineX, lineY, lineX + self.deltaX * 5, lineY + self.deltaY * 5)
-
-    love.graphics.rectangle("fill", self.x, self.y, self.playerWidth, self.playerHeight)
+    love.graphics.setColor(1,0,0)
+    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
-    local mapX, mapY, mapPosition = 0, 0, 0
-    local depthOfField = 0
-    local rayX, rayY, rayAngle = 0, 0, player.angle - DR * 30
-    local xOffset, yOffset = 0, 0
-    local inverseTangent, negativeTangent = 0, 0
-    local disH, horizontalX, horizontalY = 0, 0, 0
-    local disV, verticalX, verticalY = 0, 0, 0
+    local mapX, mapY, mapPosition
+    local depthOfField
+    local rayX, rayY
+    local rayAngle = player.angle - DR * 30
+    local xOffset, yOffset
+    local inverseTangent, negativeTangent
+    local disH, horizontalX, horizontalY
+    local disV, verticalX, verticalY
     local shade = 1
     local finalDistance = 1
-    local horizontalMapTexture, verticalMapTexture = 0, 0
+    local horizontalMapTexture, verticalMapTexture
     local newTextures = require("src.textures.ppms.newTiles")
-    local exampleTexture = require("src.textures.ppms.Texture_1")
-    local allTextures = require("src.textures.allTextures")
 
     if rayAngle < 0 then
         rayAngle = rayAngle + 2 * math.pi
@@ -180,31 +178,30 @@ function Player:DrawRays3D(lineX, lineY, player)
         horizontalY = lineY
         inverseTangent = -1 / math.tan(rayAngle)
 
-        local directionalArguments = {
-            rayX = rayX,
-            rayY = rayY,
-            xOffset = xOffset,
-            yOffset = yOffset,
-            depthOfField = depthOfField
-        }
+       ---looking up---
+       if rayAngle > math.pi then
+        rayY = math.floor(lineY / 64) * 64 - 0.0001
+        rayX = (lineY - rayY) * inverseTangent + lineX
+        yOffset = -64
+        xOffset = -yOffset * inverseTangent
+    end
 
-        ---looking up---
-        if rayAngle > math.pi then
-            Player:DirectionLook(directionalArguments, lineX, lineY, inverseTangent, -0.0001, -64)
-            ---looking down---
-        elseif rayAngle < math.pi then
-            Player:DirectionLook(directionalArguments, lineX, lineY, inverseTangent, 64, 64)
-        end
-        Player:DirectionStraight(directionalArguments, lineX, lineY, rayAngle)
-        -- looking straight left or right---
+    ---looking down---
+    if rayAngle < math.pi then
+        rayY = math.floor(lineY / 64) * 64 + 64
+        rayX = (lineY - rayY) * inverseTangent + lineX
+        yOffset = 64
+        xOffset = -yOffset * inverseTangent
+    end
 
-        rayX = directionalArguments.rayX
-        rayY = directionalArguments.rayY
-        xOffset = directionalArguments.xOffset
-        yOffset = directionalArguments.yOffset
-        depthOfField = directionalArguments.depthOfField
+    -- looking straight left or right---
+    if rayAngle == 0 or rayAngle == math.pi then
+        rayX = lineX
+        rayY = lineY
+        depthOfField = 8
+    end
 
-        while depthOfField < 8 do
+        while depthOfField < 32 do
             mapX = math.floor(rayX / 64)
             mapY = math.floor(rayY / 64)
             mapPosition = mapY * player.level.x + mapX
@@ -216,7 +213,7 @@ function Player:DrawRays3D(lineX, lineY, player)
                 horizontalX = rayX
                 horizontalY = rayY
                 disH = Player:Dist(lineX, lineY, horizontalX, horizontalY, rayAngle)
-                depthOfField = 8
+                depthOfField = 32
             else
                 rayX = rayX + xOffset
                 rayY = rayY + yOffset
@@ -253,10 +250,10 @@ function Player:DrawRays3D(lineX, lineY, player)
         if rayAngle == 0 or rayAngle == math.pi then
             rayX = lineX
             rayY = lineY
-            depthOfField = 8
+            depthOfField = 32
         end
 
-        while depthOfField < 8 do
+        while depthOfField < 32 do
             mapX = math.floor(rayX / 64)
             mapY = math.floor(rayY / 64)
             mapPosition = mapY * player.level.x + mapX
@@ -268,7 +265,7 @@ function Player:DrawRays3D(lineX, lineY, player)
                 verticalX = rayX
                 verticalY = rayY
                 disV = Player:Dist(lineX, lineY, verticalX, verticalY, rayAngle)
-                depthOfField = 8
+                depthOfField = 32
             else
                 rayX = rayX + xOffset
                 rayY = rayY + yOffset
@@ -282,7 +279,6 @@ function Player:DrawRays3D(lineX, lineY, player)
             rayX = verticalX
             rayY = verticalY
             finalDistance = disV
-            love.graphics.setColor(0.9, 0, 0)
         end
 
         if disH < disV then
@@ -290,11 +286,7 @@ function Player:DrawRays3D(lineX, lineY, player)
             rayX = horizontalX
             rayY = horizontalY
             finalDistance = disH
-            love.graphics.setColor(0.7, 0, 0)
         end
-
-        ---draw ray---
-        love.graphics.line(lineX, lineY, rayX, rayY)
 
         ---draw 3d scene---
         local lineH
@@ -312,19 +304,19 @@ function Player:DrawRays3D(lineX, lineY, player)
 
         finalDistance = finalDistance * math.cos(cosineAngle)
 
-        lineH = (player.level.blockSize * 320) / finalDistance
+        lineH = (player.level.blockSize * 640) / finalDistance
 
         local textureYStep = (32 / lineH)
         local textureYOffset = 0
 
-        if lineH > 320 then
-            textureYOffset = (lineH - 320) / 2
-            lineH = 320
+        if lineH > 640 then
+            textureYOffset = (lineH - 640) / 2
+            lineH = 640
         end
-        lineO = 160 - lineH / 2
+        lineO = 320 - lineH / 2
 
         ---draw walls---
-        local textureY = (textureYOffset * textureYStep) --+ ((horizontalMapTexture - 1) * 32)
+        local textureY = (textureYOffset * textureYStep)
         local textureX
 
         if shade == 0.7 then
@@ -338,36 +330,20 @@ function Player:DrawRays3D(lineX, lineY, player)
                 textureX = 31 - textureX
             end
         end
-        print(horizontalMapTexture)
+        
         for pixelY = 1, lineH do
-            ---local index = (math.floor(textureY) * 32) + 1 + textureX
-            ---local c = allTextures[index] * shade
-            ---love.graphics.setPointSize(4)
-            ---if horizontalMapTexture == 1 then
-            ---    love.graphics.setColor(c, c / 2, c / 2)
-            ---end
-            ---if horizontalMapTexture == 2 then
-            ---    love.graphics.setColor(c, c, c / 2)
-            ---end
-            ---if horizontalMapTexture == 3 then
-            ---    love.graphics.setColor(c / 2, c / 2, c)
-            ---end
-            ---if horizontalMapTexture == 4 then
-            ---    love.graphics.setColor(c / 2, c, c / 2)
-            ---end
-            ---love.graphics.points(rays * 4 + 510, pixelY + lineO)
+
             local pixel = (((math.floor(textureY)) * 32 + math.floor(textureX)) * 3) + (((horizontalMapTexture - 1) * 32 * 32 * 3))
-            local red = newTiles[pixel + 1] / 255 * shade
-            local green = newTiles[pixel + 2] / 255 * shade
-            local blue = newTiles[pixel + 3] / 255 * shade
-            love.graphics.setPointSize(4)
-            love.graphics.setColor(red, green, blue)
-            love.graphics.points(rays * 4 + 510, pixelY + lineO)
+            local wallRed = newTiles[pixel + 1] / 255 * shade
+            local wallGreen = newTiles[pixel + 2] / 255 * shade
+            local wallBlue = newTiles[pixel + 3] / 255 * shade
+            love.graphics.setColor(wallRed, wallGreen, wallBlue)
+            love.graphics.points(rays * 8, pixelY + lineO)
             textureY = textureY + textureYStep
         end
 
-        ---draw floors---
-        for i = lineO + lineH, 320 do
+        ---floor logic---
+        for i = lineO + lineH, 640 do
             local bit = require('bit')
             local newAngle = player.angle - rayAngle
             if newAngle < PI2 or newAngle > PI3 then
@@ -376,12 +352,12 @@ function Player:DrawRays3D(lineX, lineY, player)
             if newAngle < 0 then
                 newAngle = newAngle + 360 / DR
             end
-            local drawY = i - (320/2)
+            local drawY = i - (640/2)
             local raFix = math.cos(newAngle)
 
-            textureX = (player.x / 2 + math.cos(rayAngle) * 158  * 32 / drawY / raFix) + 1
+            textureX = (player.x / 2 + math.cos(rayAngle) * 158  * 2 * 32 / drawY / raFix) + 1
 
-            textureY = (player.y / 2 + math.sin(rayAngle) * 158 * 32 / drawY / raFix) + 1
+            textureY = (player.y / 2 + math.sin(rayAngle) * 158 * 2 * 32 / drawY / raFix) + 1
             
             local arrayFloorIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
 
@@ -389,40 +365,27 @@ function Player:DrawRays3D(lineX, lineY, player)
             
             mapPosition = (player.level.arrayFloor[arrayFloorIndex] - 1) * 32 * 32 + 1
 
-            local pixel = (index * 3 + (mapPosition - 1) * 3)
-            local red = newTiles[pixel + 1] / 255 * 0.7
-            local green = newTiles[pixel + 2] / 255 * 0.7
-            local blue = newTiles[pixel + 3] / 255 * 0.7
-            love.graphics.setPointSize(4)
-            love.graphics.setColor(red, green, blue)
-            love.graphics.points(rays * 4 + 510, i)
-
-
-
-            --local c = allTextures[index] * 0.7
-
-            --love.graphics.setColor(c/1.3, c/1.3, c)
-            --love.graphics.points(rays * 4 + 510, i)
-            ---draw ceiling---
             
+            ---ceiling logic---
             
-            --local index = (bit.band(textureY, 31) * 32) + bit.band(textureX, 31) + mapPosition
-            --local c = allTextures[index] * 0.7
-            
-            --love.graphics.setColor(c/2, c/1.2, c/2)
-            --love.graphics.points(rays * 4 + 510, 320 - i)
-
             local arrayCeilingIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
             
             mapPosition = (player.level.arrayCeiling[arrayCeilingIndex] - 1) * 32 * 32 + 1
-
+            
+            ---draw floors---
             local pixel = (index * 3 + (mapPosition - 1) * 3)
-            local red = newTiles[pixel + 1] / 255 
-            local green = newTiles[pixel + 2] / 255 
-            local blue = newTiles[pixel + 3] / 255 
-            love.graphics.setPointSize(4)
-            love.graphics.setColor(red, green, blue)
-            love.graphics.points(rays * 4 + 510, 320 - i)
+            local floorRed = newTiles[pixel + 1] / 255 * 0.7
+            local floorGreen = newTiles[pixel + 2] / 255 * 0.7
+            local floorBlue = newTiles[pixel + 3] / 255 * 0.7
+            love.graphics.setColor(floorRed, floorGreen, floorBlue)
+            love.graphics.points(rays * 8, i)
+            ---draw ceiling---
+            pixel = (index * 3 + (mapPosition - 1) * 3)
+            local CeilRed = newTiles[pixel + 1] / 255 
+            local CeilGreen = newTiles[pixel + 2] / 255 
+            local CeilBlue = newTiles[pixel + 3] / 255 
+            love.graphics.setColor(CeilRed, CeilGreen, CeilBlue)
+            love.graphics.points(rays * 8, 640 - i)
         end
 
         rayAngle = rayAngle + DR / 2
@@ -437,7 +400,7 @@ function Player:DrawRays3D(lineX, lineY, player)
     end
 end
 
-function Player:Dist(ax, ay, bx, by, angle)
+function Player:Dist(ax, ay, bx, by)
     return (math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)))
 end
 
@@ -452,6 +415,6 @@ function Player:DirectionStraight(args, lineX, lineY, rayAngle)
     if rayAngle == 0 or rayAngle == math.pi then
         args.rayX = lineX
         args.rayY = lineY
-        args.depthOfField = 8
+        args.depthOfField = 32
     end
 end
