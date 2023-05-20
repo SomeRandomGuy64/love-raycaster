@@ -147,6 +147,22 @@ function Player:draw()
     love.graphics.line(lineX, lineY, lineX + self.deltaX * 5, lineY + self.deltaY * 5)
 
     love.graphics.rectangle("fill", self.x, self.y, self.playerWidth, self.playerHeight)
+
+    local exampleTexture = require("src.textures.ppms.Texture_1")
+
+    for i = 1, 32 do
+        for j = 1, 31 do
+          local pixel = ((i - 1) * 32 + j) * 3
+          local red = exampleTexture[pixel - 2] / 255
+          local green = exampleTexture[pixel - 1] / 255
+          local blue = exampleTexture[pixel] / 255
+          love.graphics.setPointSize(8)
+          love.graphics.setColor(red, green, blue)
+          love.graphics.points(i * 8, j * 8)
+        end
+      end
+      
+
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
@@ -160,6 +176,7 @@ function Player:DrawRays3D(lineX, lineY, player)
     local shade = 1
     local finalDistance = 1
     local horizontalMapTexture, verticalMapTexture = 0, 0
+    local exampleTexture = require("src.textures.ppms.Texture_1")
     local allTextures = require("src.textures.allTextures")
 
     if rayAngle < 0 then
