@@ -41,8 +41,8 @@ function love.load()
     }
     map1 = Map(8, 8, 64, map1Array, floor1Array, ceiling1Array)
 
-    local p1X = 300
-    local p1Y = 300
+    local p1X = 416
+    local p1Y = 416
     local p1Width = 8
     local p1Height = 8
     player1 = Player(p1X, p1Y, p1Width, p1Height, map1)
