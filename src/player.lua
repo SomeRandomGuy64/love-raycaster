@@ -138,7 +138,8 @@ end
 function Player:draw()
     Player.super.draw(self)
 
-    
+    love.graphics.setPointSize(8)
+
     local lineX = self.x + (self.playerWidth / 2)
     local lineY = self.y + (self.playerHeight / 2)
     
@@ -148,19 +149,18 @@ function Player:draw()
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
-    local mapX, mapY, mapPosition = 0, 0, 0
-    local depthOfField = 0
-    local rayX, rayY, rayAngle = 0, 0, player.angle - DR * 30
-    local xOffset, yOffset = 0, 0
-    local inverseTangent, negativeTangent = 0, 0
-    local disH, horizontalX, horizontalY = 0, 0, 0
-    local disV, verticalX, verticalY = 0, 0, 0
+    local mapX, mapY, mapPosition
+    local depthOfField
+    local rayX, rayY
+    local rayAngle = player.angle - DR * 30
+    local xOffset, yOffset
+    local inverseTangent, negativeTangent
+    local disH, horizontalX, horizontalY
+    local disV, verticalX, verticalY
     local shade = 1
     local finalDistance = 1
-    local horizontalMapTexture, verticalMapTexture = 0, 0
+    local horizontalMapTexture, verticalMapTexture
     local newTextures = require("src.textures.ppms.newTiles")
-    local exampleTexture = require("src.textures.ppms.Texture_1")
-    local allTextures = require("src.textures.allTextures")
 
     if rayAngle < 0 then
         rayAngle = rayAngle + 2 * math.pi
@@ -178,29 +178,28 @@ function Player:DrawRays3D(lineX, lineY, player)
         horizontalY = lineY
         inverseTangent = -1 / math.tan(rayAngle)
 
-        local directionalArguments = {
-            rayX = rayX,
-            rayY = rayY,
-            xOffset = xOffset,
-            yOffset = yOffset,
-            depthOfField = depthOfField
-        }
+       ---looking up---
+       if rayAngle > math.pi then
+        rayY = math.floor(lineY / 64) * 64 - 0.0001
+        rayX = (lineY - rayY) * inverseTangent + lineX
+        yOffset = -64
+        xOffset = -yOffset * inverseTangent
+    end
 
-        ---looking up---
-        if rayAngle > math.pi then
-            Player:DirectionLook(directionalArguments, lineX, lineY, inverseTangent, -0.0001, -64)
-            ---looking down---
-        elseif rayAngle < math.pi then
-            Player:DirectionLook(directionalArguments, lineX, lineY, inverseTangent, 64, 64)
-        end
-        Player:DirectionStraight(directionalArguments, lineX, lineY, rayAngle)
-        -- looking straight left or right---
+    ---looking down---
+    if rayAngle < math.pi then
+        rayY = math.floor(lineY / 64) * 64 + 64
+        rayX = (lineY - rayY) * inverseTangent + lineX
+        yOffset = 64
+        xOffset = -yOffset * inverseTangent
+    end
 
-        rayX = directionalArguments.rayX
-        rayY = directionalArguments.rayY
-        xOffset = directionalArguments.xOffset
-        yOffset = directionalArguments.yOffset
-        depthOfField = directionalArguments.depthOfField
+    -- looking straight left or right---
+    if rayAngle == 0 or rayAngle == math.pi then
+        rayX = lineX
+        rayY = lineY
+        depthOfField = 8
+    end
 
         while depthOfField < 32 do
             mapX = math.floor(rayX / 64)
@@ -335,16 +334,15 @@ function Player:DrawRays3D(lineX, lineY, player)
         for pixelY = 1, lineH do
 
             local pixel = (((math.floor(textureY)) * 32 + math.floor(textureX)) * 3) + (((horizontalMapTexture - 1) * 32 * 32 * 3))
-            local red = newTiles[pixel + 1] / 255 * shade
-            local green = newTiles[pixel + 2] / 255 * shade
-            local blue = newTiles[pixel + 3] / 255 * shade
-            love.graphics.setPointSize(8)
-            love.graphics.setColor(red, green, blue)
+            local wallRed = newTiles[pixel + 1] / 255 * shade
+            local wallGreen = newTiles[pixel + 2] / 255 * shade
+            local wallBlue = newTiles[pixel + 3] / 255 * shade
+            love.graphics.setColor(wallRed, wallGreen, wallBlue)
             love.graphics.points(rays * 8, pixelY + lineO)
             textureY = textureY + textureYStep
         end
 
-        ---draw floors---
+        ---floor logic---
         for i = lineO + lineH, 640 do
             local bit = require('bit')
             local newAngle = player.angle - rayAngle
@@ -367,26 +365,26 @@ function Player:DrawRays3D(lineX, lineY, player)
             
             mapPosition = (player.level.arrayFloor[arrayFloorIndex] - 1) * 32 * 32 + 1
 
-            local pixel = (index * 3 + (mapPosition - 1) * 3)
-            local red = newTiles[pixel + 1] / 255 * 0.7
-            local green = newTiles[pixel + 2] / 255 * 0.7
-            local blue = newTiles[pixel + 3] / 255 * 0.7
-            love.graphics.setPointSize(8)
-            love.graphics.setColor(red, green, blue)
-            love.graphics.points(rays * 8, i)
-
-            ---draw ceiling---
-
+            
+            ---ceiling logic---
+            
             local arrayCeilingIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
             
             mapPosition = (player.level.arrayCeiling[arrayCeilingIndex] - 1) * 32 * 32 + 1
-
+            
+            ---draw floors---
             local pixel = (index * 3 + (mapPosition - 1) * 3)
-            local red = newTiles[pixel + 1] / 255 
-            local green = newTiles[pixel + 2] / 255 
-            local blue = newTiles[pixel + 3] / 255 
-            love.graphics.setPointSize(8)
-            love.graphics.setColor(red, green, blue)
+            local floorRed = newTiles[pixel + 1] / 255 * 0.7
+            local floorGreen = newTiles[pixel + 2] / 255 * 0.7
+            local floorBlue = newTiles[pixel + 3] / 255 * 0.7
+            love.graphics.setColor(floorRed, floorGreen, floorBlue)
+            love.graphics.points(rays * 8, i)
+            ---draw ceiling---
+            pixel = (index * 3 + (mapPosition - 1) * 3)
+            local CeilRed = newTiles[pixel + 1] / 255 
+            local CeilGreen = newTiles[pixel + 2] / 255 
+            local CeilBlue = newTiles[pixel + 3] / 255 
+            love.graphics.setColor(CeilRed, CeilGreen, CeilBlue)
             love.graphics.points(rays * 8, 640 - i)
         end
 
