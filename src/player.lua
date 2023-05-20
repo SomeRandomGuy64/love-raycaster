@@ -160,6 +160,7 @@ function Player:DrawRays3D(lineX, lineY, player)
     local shade = 1
     local finalDistance = 1
     local horizontalMapTexture, verticalMapTexture = 0, 0
+    local newTextures = require("src.textures.ppms.newTiles")
     local exampleTexture = require("src.textures.ppms.Texture_1")
     local allTextures = require("src.textures.allTextures")
 
@@ -337,7 +338,7 @@ function Player:DrawRays3D(lineX, lineY, player)
                 textureX = 31 - textureX
             end
         end
-
+        print(horizontalMapTexture)
         for pixelY = 1, lineH do
             ---local index = (math.floor(textureY) * 32) + 1 + textureX
             ---local c = allTextures[index] * shade
@@ -355,10 +356,10 @@ function Player:DrawRays3D(lineX, lineY, player)
             ---    love.graphics.setColor(c / 2, c, c / 2)
             ---end
             ---love.graphics.points(rays * 4 + 510, pixelY + lineO)
-            local pixel = (((math.floor(textureY)) * 32 + math.floor(textureX)) * 3)
-            local red = exampleTexture[pixel + 1] / 255 * shade
-            local green = exampleTexture[pixel + 2] / 255 * shade
-            local blue = exampleTexture[pixel + 3] / 255 * shade
+            local pixel = (((math.floor(textureY)) * 32 + math.floor(textureX)) * 3) + (((horizontalMapTexture - 1) * 32 * 32 * 3))
+            local red = newTiles[pixel + 1] / 255 * shade
+            local green = newTiles[pixel + 2] / 255 * shade
+            local blue = newTiles[pixel + 3] / 255 * shade
             love.graphics.setPointSize(8)
             love.graphics.setColor(red, green, blue)
             love.graphics.points(rays * 4 + 510, pixelY + lineO)
