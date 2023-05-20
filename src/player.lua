@@ -147,22 +147,6 @@ function Player:draw()
     love.graphics.line(lineX, lineY, lineX + self.deltaX * 5, lineY + self.deltaY * 5)
 
     love.graphics.rectangle("fill", self.x, self.y, self.playerWidth, self.playerHeight)
-
-    local exampleTexture = require("src.textures.ppms.Texture_1")
-
-    for i = 1, 32 do
-        for j = 1, 31 do
-          local pixel = ((i - 1) * 32 + j) * 3
-          local red = exampleTexture[pixel - 2] / 255
-          local green = exampleTexture[pixel - 1] / 255
-          local blue = exampleTexture[pixel] / 255
-          love.graphics.setPointSize(8)
-          love.graphics.setColor(red, green, blue)
-          love.graphics.points(i * 8, j * 8)
-        end
-      end
-      
-
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
@@ -339,7 +323,7 @@ function Player:DrawRays3D(lineX, lineY, player)
         lineO = 160 - lineH / 2
 
         ---draw walls---
-        local textureY = (textureYOffset * textureYStep) + ((horizontalMapTexture - 1) * 32)
+        local textureY = (textureYOffset * textureYStep) --+ ((horizontalMapTexture - 1) * 32)
         local textureX
 
         if shade == 0.7 then
@@ -355,21 +339,28 @@ function Player:DrawRays3D(lineX, lineY, player)
         end
 
         for pixelY = 1, lineH do
-            local index = (math.floor(textureY) * 32) + 1 + textureX
-            local c = allTextures[index] * shade
-            love.graphics.setPointSize(4)
-            if horizontalMapTexture == 1 then
-                love.graphics.setColor(c, c / 2, c / 2)
-            end
-            if horizontalMapTexture == 2 then
-                love.graphics.setColor(c, c, c / 2)
-            end
-            if horizontalMapTexture == 3 then
-                love.graphics.setColor(c / 2, c / 2, c)
-            end
-            if horizontalMapTexture == 4 then
-                love.graphics.setColor(c / 2, c, c / 2)
-            end
+            ---local index = (math.floor(textureY) * 32) + 1 + textureX
+            ---local c = allTextures[index] * shade
+            ---love.graphics.setPointSize(4)
+            ---if horizontalMapTexture == 1 then
+            ---    love.graphics.setColor(c, c / 2, c / 2)
+            ---end
+            ---if horizontalMapTexture == 2 then
+            ---    love.graphics.setColor(c, c, c / 2)
+            ---end
+            ---if horizontalMapTexture == 3 then
+            ---    love.graphics.setColor(c / 2, c / 2, c)
+            ---end
+            ---if horizontalMapTexture == 4 then
+            ---    love.graphics.setColor(c / 2, c, c / 2)
+            ---end
+            ---love.graphics.points(rays * 4 + 510, pixelY + lineO)
+            local pixel = (((math.floor(textureY)) * 32 + math.floor(textureX)) * 3)
+            local red = exampleTexture[pixel + 1] / 255 * shade
+            local green = exampleTexture[pixel + 2] / 255 * shade
+            local blue = exampleTexture[pixel + 3] / 255 * shade
+            love.graphics.setPointSize(8)
+            love.graphics.setColor(red, green, blue)
             love.graphics.points(rays * 4 + 510, pixelY + lineO)
             textureY = textureY + textureYStep
         end
@@ -401,7 +392,7 @@ function Player:DrawRays3D(lineX, lineY, player)
 
             love.graphics.setColor(c/1.3, c/1.3, c)
             love.graphics.points(rays * 4 + 510, i)
-
+            ---draw ceiling---
             local arrayCeilingIndex = math.floor(textureY / 32) * 8 + math.floor(textureX / 32) + 1
 
             mapPosition = (player.level.arrayCeiling[arrayCeilingIndex] - 1) * 32 * 32 + 1
