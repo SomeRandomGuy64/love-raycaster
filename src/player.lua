@@ -403,18 +403,3 @@ end
 function Player:Dist(ax, ay, bx, by)
     return (math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)))
 end
-
-function Player:DirectionLook(args, lineX, lineY, inverseTangent, mainOffset, blockSize)
-    args.rayY = math.floor(lineY / 64) * 64 + mainOffset
-    args.rayX = (lineY - args.rayY) * inverseTangent + lineX
-    args.yOffset = blockSize
-    args.xOffset = -args.yOffset * inverseTangent
-end
-
-function Player:DirectionStraight(args, lineX, lineY, rayAngle)
-    if rayAngle == 0 or rayAngle == math.pi then
-        args.rayX = lineX
-        args.rayY = lineY
-        args.depthOfField = 32
-    end
-end
