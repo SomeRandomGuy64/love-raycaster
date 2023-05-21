@@ -313,7 +313,7 @@ function Player:DrawRays3D(lineX, lineY, player)
                 verticalMapTexture = player.level.arrayMap[mapPosition + 1]
                 verticalX = rayX
                 verticalY = rayY
-                disV = Player:Dist(lineX, lineY, verticalX, verticalY, rayAngle)
+                disV = Player:Dist(lineX, lineY, verticalX, verticalY)
                 depthOfField = DOF
             else
                 rayX = rayX + xOffset
