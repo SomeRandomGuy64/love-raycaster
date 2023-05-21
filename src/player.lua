@@ -138,6 +138,9 @@ function Player:update(dt)
     if love.keyboard.isDown("f") then
         local doorXOffset = 0
         local doorYOffset = 0
+        local doorRXOffset = 0
+        local doorRYOffset = 0
+
         if self.deltaX < 0 then
             doorXOffset = -25
         else
@@ -150,14 +153,14 @@ function Player:update(dt)
             doorYOffset = 25
         end
 
-        gridPositionX = math.floor(self.x / 64)
         gridPositionMinusXOffset = math.floor((self.x + doorXOffset) / 64)
-
-        gridPositionY = math.floor(self.x / 64)
         gridPositionMinusYOffset = math.floor((self.y + doorYOffset) / 64)
 
         if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusXOffset) + 1] == 4 then
             self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusXOffset) + 1] = 0
+        end
+        if self.level.arrayMap[math.floor(gridPositionMinusYOffset * self.level.x + gridPositionX) + 1] == 4 then
+            self.level.arrayMap[math.floor(gridPositionMinusYOffset * self.level.x + gridPositionX) + 1] = 0
         end
     end
 end
