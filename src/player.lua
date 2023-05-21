@@ -16,6 +16,8 @@ function Player:new(x, y, playerWidth, playerHeight, level)
 
     self.deltaX = math.cos(self.angle) * self.speed
     self.deltaY = math.sin(self.angle) * self.speed
+    self.deltaRX = self.deltaY
+    self.deltaRY = -self.deltaX
 
     self.controlFlag = true
 
@@ -32,6 +34,8 @@ function Player:update(dt)
     ---collision---
     local xOffset = 0
     local yOffset = 0
+    local rXOffset = 0
+    local rYOffset = 0
 
     if self.deltaX < 0 then
         xOffset = -20
@@ -39,9 +43,19 @@ function Player:update(dt)
         xOffset = 20
     end
 
+    if self.deltaRX < 0 then
+        rXOffset = -20
+    else
+        rXOffset = 20
+    end
+
+
     local gridPositionX = math.floor(self.x / 64)
     local gridPositionPlusXOffset = math.floor((self.x + xOffset) / 64)
     local gridPositionMinusXOffset = math.floor((self.x - xOffset) / 64)
+
+    local gridPositionPlusRXOffset = math.floor((self.x + rXOffset) / 64)
+    local gridPositionMinusRXOffset = math.floor((self.x - rXOffset) / 64)
 
     if self.deltaY < 0 then
         yOffset = -20
@@ -49,11 +63,38 @@ function Player:update(dt)
         yOffset = 20
     end
 
+    if self.deltaRY < 0 then
+        rYOffset = -20
+    else
+        rYOffset = 20
+    end
+
     local gridPositionY = math.floor(self.y / 64)
     local gridPositionPlusYOffset = math.floor((self.y + yOffset) / 64)
     local gridPositionMinusYOffset = math.floor((self.y - yOffset) / 64)
 
+    local gridPositionPlusRYOffset = math.floor((self.y + rYOffset) / 64)
+    local gridPositionMinusRYOffset = math.floor((self.y - rYOffset) / 64)
+
     ---controls---
+    if love.keyboard.isDown("q") then
+        if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionPlusRXOffset) + 1] == 0 then
+            self.y = self.y + (self.deltaRY * dt * self.speed)
+        end
+        if self.level.arrayMap[math.floor(gridPositionPlusRYOffset * self.level.x + gridPositionX) + 1] == 0 then
+            self.x = self.x + (self.deltaRX * dt * self.speed)
+        end
+    end
+
+    if love.keyboard.isDown("e") then
+        if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusRXOffset) + 1] == 0 then
+            self.x = self.x - (self.deltaRX * dt * self.speed)
+        end
+        if self.level.arrayMap[math.floor(gridPositionMinusRYOffset * self.level.x + gridPositionX) + 1] == 0 then
+            self.y = self.y - (self.deltaRY * dt * self.speed)
+        end
+    end
+
     if love.keyboard.isDown("w") then
         if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionPlusXOffset) + 1] == 0 then
             self.x = self.x + (self.deltaX * dt * self.speed)
@@ -79,6 +120,8 @@ function Player:update(dt)
         end
         self.deltaX = math.cos(self.angle) * self.speed
         self.deltaY = math.sin(self.angle) * self.speed
+        self.deltaRX = self.deltaY
+        self.deltaRY = -self.deltaX
     end
 
     if love.keyboard.isDown("d") then
@@ -88,9 +131,11 @@ function Player:update(dt)
         end
         self.deltaX = math.cos(self.angle) * self.speed
         self.deltaY = math.sin(self.angle) * self.speed
+        self.deltaRX = self.deltaY
+        self.deltaRY = -self.deltaX
     end
 
-    if love.keyboard.isDown("e") then
+    if love.keyboard.isDown("f") then
         local doorXOffset = 0
         local doorYOffset = 0
         if self.deltaX < 0 then
