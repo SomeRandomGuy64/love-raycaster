@@ -8,6 +8,7 @@ function love.load()
 
     dungeonMusic = love.audio.newSource('src/music/dungeon.mp3', 'stream')
     dungeonMusic:setVolume(0.40)
+    dungeonMusic:setLooping( true )
     dungeonMusic:play()
 
     ---MAP SIZE MUST BE A SQUARE NUMBER UNLESS YOU'RE WILLING TO DIG DEEPER INTO THE CODE TO CHANGE THAT
