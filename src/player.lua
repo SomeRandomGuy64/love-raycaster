@@ -50,12 +50,12 @@ function Player:update(dt)
     end
 
 
-    local gridPositionX = math.floor(self.x / 64)
-    local gridPositionPlusXOffset = math.floor((self.x + xOffset) / 64)
-    local gridPositionMinusXOffset = math.floor((self.x - xOffset) / 64)
+    local gridPositionX = math.floor(self.x / self.level.blockSize)
+    local gridPositionPlusXOffset = math.floor((self.x + xOffset) / self.level.blockSize)
+    local gridPositionMinusXOffset = math.floor((self.x - xOffset) / self.level.blockSize)
 
-    local gridPositionPlusRXOffset = math.floor((self.x + rXOffset) / 64)
-    local gridPositionMinusRXOffset = math.floor((self.x - rXOffset) / 64)
+    local gridPositionPlusRXOffset = math.floor((self.x + rXOffset) / self.level.blockSize)
+    local gridPositionMinusRXOffset = math.floor((self.x - rXOffset) / self.level.blockSize)
 
     if self.deltaY < 0 then
         yOffset = -20
@@ -70,11 +70,11 @@ function Player:update(dt)
     end
 
     local gridPositionY = math.floor(self.y / 64)
-    local gridPositionPlusYOffset = math.floor((self.y + yOffset) / 64)
-    local gridPositionMinusYOffset = math.floor((self.y - yOffset) / 64)
+    local gridPositionPlusYOffset = math.floor((self.y + yOffset) / self.level.blockSize)
+    local gridPositionMinusYOffset = math.floor((self.y - yOffset) / self.level.blockSize)
 
-    local gridPositionPlusRYOffset = math.floor((self.y + rYOffset) / 64)
-    local gridPositionMinusRYOffset = math.floor((self.y - rYOffset) / 64)
+    local gridPositionPlusRYOffset = math.floor((self.y + rYOffset) / self.level.blockSize)
+    local gridPositionMinusRYOffset = math.floor((self.y - rYOffset) / self.level.blockSize)
 
     ---controls---
     if love.keyboard.isDown("q") then
@@ -153,8 +153,8 @@ function Player:update(dt)
             doorYOffset = 25
         end
 
-        gridPositionMinusXOffset = math.floor((self.x + doorXOffset) / 64)
-        gridPositionMinusYOffset = math.floor((self.y + doorYOffset) / 64)
+        gridPositionMinusXOffset = math.floor((self.x + doorXOffset) / self.level.blockSize)
+        gridPositionMinusYOffset = math.floor((self.y + doorYOffset) / self.level.blockSize)
 
         if self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusXOffset) + 1] == 4 then
             self.level.arrayMap[math.floor(gridPositionY * self.level.x + gridPositionMinusXOffset) + 1] = 0
