@@ -10,7 +10,7 @@ function Player:new(x, y, playerWidth, playerHeight, level)
     self.playerHeight = playerHeight
     self.level = level
     
-    self.angle = 0
+    self.angle = 11
     
     self.speed = 10
     
