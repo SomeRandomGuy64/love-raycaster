@@ -7,7 +7,7 @@ function love.load()
     require "src.player"
 
     dungeonMusic = love.audio.newSource('src/music/dungeon.mp3', 'stream')
-    dungeonMusic:setVolume(0.40)
+    dungeonMusic:setVolume(0)
     dungeonMusic:setLooping( true )
     dungeonMusic:play()
 

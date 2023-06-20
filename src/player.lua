@@ -20,6 +20,8 @@ function Player:new(x, y, playerWidth, playerHeight, level)
     self.deltaRY = -self.deltaX
     
     self.controlFlag = true
+
+    self.printx = 0
     
     _G.DOF = math.sqrt(#self.level.arrayMap)
 end
@@ -195,6 +197,8 @@ function Player:draw()
     Player:DrawRays3D(lineX, lineY, self)
     love.graphics.setColor(1,0,0)
     love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+
+    love.graphics.print("Mouse position: "..tostring(love.mouse.getX()), 10, 30)
 end
 
 function Player:DrawRays3D(lineX, lineY, player)
