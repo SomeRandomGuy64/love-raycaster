@@ -21,7 +21,7 @@ function Player:new(x, y, playerWidth, playerHeight, level)
     
     self.controlFlag = true
 
-    self.printx = 0
+    self.printdx = 0
     
     _G.DOF = math.sqrt(#self.level.arrayMap)
 end
@@ -116,7 +116,8 @@ function Player:update(dt)
         end
     end
 
-    if love.keyboard.isDown("a") then
+    if love.keyboard.isDown("a") or self.printdx < 0 then
+        print(self.printdx.." update function")
         self.angle = self.angle - (2 * dt)
         if self.angle < 0 then
             self.angle = self.angle + (2 * math.pi)
@@ -184,6 +185,15 @@ function Player:QuickPress(player, dt)
     end
     player.deltaX = math.cos(player.angle) * player.speed
     player.deltaY = math.sin(player.angle) * player.speed
+end
+
+function Player:mousemoved(x, y, dx, dy, istouch)
+    -- Is called when the mouse is moved
+    --x, y = the new position of the mouse
+    --dx, dy = the amount moved since the last time this function was called
+    
+    self.printdx = dx
+    print(self.printdx)
 end
 
 function Player:draw()
