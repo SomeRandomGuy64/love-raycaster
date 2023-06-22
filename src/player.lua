@@ -121,7 +121,6 @@ function Player:update(dt)
     end
 
     if love.keyboard.isDown("a") or self.printdx < 0 then
-        print(self.printdx.." update function")
         self.angle = self.angle - (2 * dt)
         if self.angle < 0 then
             self.angle = self.angle + (2 * math.pi)
