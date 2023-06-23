@@ -120,7 +120,7 @@ function Player:update(dt)
         end
     end
 
-    if love.keyboard.isDown("a") or self.printdx < 0 then
+    if love.keyboard.isDown("a") then
         self.angle = self.angle - (2 * dt)
         if self.angle < 0 then
             self.angle = self.angle + (2 * math.pi)
@@ -131,7 +131,7 @@ function Player:update(dt)
         self.deltaRY = -self.deltaX
     end
 
-    if love.keyboard.isDown("d") or self.printdx > 0 then
+    if love.keyboard.isDown("d") then
         self.angle = self.angle + (2 * dt)
         if self.angle > 2 * math.pi then
             self.angle = self.angle - (2 * math.pi)
